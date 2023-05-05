@@ -3,7 +3,7 @@ const jwt=require("jsonwebtoken");
 const {hashPassword,comparePassword}=require("../helpers/auth");
 
 //register
-exports.register=async (req,res)=>{
+const register=async (req,res)=>{
     try{
         const {name,email,password,address}=req.body;
         if(!name.trim()){
@@ -23,7 +23,7 @@ exports.register=async (req,res)=>{
 
         //hash password
         const hashedPassword=await hashPassword(password);
-        //create user
+        //save user
         const user=await new User({
             name,
             email,
@@ -42,12 +42,12 @@ exports.register=async (req,res)=>{
                 address:user.address
             },
             token
-        })
+        });
     }catch (error){
         console.log(error);
     }
 }
-exports.login=async (req,res)=>{
+const login=async (req,res)=>{
     try {
         //destructured data from user
         const {email, password} = req.body;
@@ -84,3 +84,32 @@ exports.login=async (req,res)=>{
         console.log(error);
     }
 }
+
+//update profile
+const update=async(req,res)=>{
+    try{
+    const {name,password,address}=req.body;
+    const user=await User.findById(req.user._id);
+    if(password && password.length<8){
+        return res.json({error:"Password must be more than 8 character"});
+    }
+    //hash password with ternary operator
+    const hashedPassword=password ? await  hashPassword(password) :undefined;
+    const updated=await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            name:name ||user.name,
+            password:hashedPassword ||user.password,
+            address:address ||user.address
+        },
+        {
+            new:true
+        }
+    );
+    updated.password=undefined;
+    res.json(updated);
+    }catch(error){
+        console.log(error);
+    }
+}
+module.exports= {register,login,update}
