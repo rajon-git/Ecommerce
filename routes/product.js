@@ -4,7 +4,7 @@ const formidable=require("express-formidable")
 
 
 const {create,list,read,remove,photo,update,filteredProducts,productsCount,listProducts
-,productsKeyword,relatedProducts}=require("../controllers/product");
+,productsKeyword,relatedProducts,getToken,processPayment,orderStatus}=require("../controllers/product");
 const { requireSignin, isAdmin } = require("../middlewares/auth");
 
 router.post("/product",requireSignin,isAdmin,formidable(),create);
@@ -17,5 +17,9 @@ router.post("/filtered-products",filteredProducts);
 router.get("/products-count",productsCount);
 router.get("/list-products/:page",listProducts);
 router.get("/products/search/:keyword",productsKeyword);
-router.get("/related-products/:productId/:categoryId", relatedProducts)
+router.get("/related-products/:productId/:categoryId", relatedProducts);
+
+router.get("/braintree/token",getToken);
+router.post("/braintree/payment",requireSignin,processPayment);
+router.put("/order-status/:orderId",requireSignin,isAdmin,orderStatus);
 module.exports=router;
