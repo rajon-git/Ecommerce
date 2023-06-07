@@ -320,17 +320,17 @@ const orderStatus=async(req,res)=>{
     const emailData={
       from:process.env.EMAIL_FROM,
       to:order.buyer.email,
-      subject:"Oder Status",
+      subject:"Order Status",
       html:`
       <h1> Hi ${order.buyer.name}, your order status is: <span style="color:red;">${order.status}?</span></h1>
       <p>Visit <a href="${process.env.CLIENT_URL}/dashboard/user/orders">your dashboard<a> for more details</p>`
     };
     try{
-      await sgMail.send(emnailData);
+      await sgMail.send(emailData);
     }catch(error){
-      console.log(error)
+      console.log(error);
     }
-    res.json(order)
+    res.json(order);
 
   }catch(error){
     console.log(error);

@@ -1,6 +1,7 @@
 const User=require("../models/user");
 const jwt=require("jsonwebtoken");
 const {hashPassword,comparePassword}=require("../helpers/auth");
+const Order=require("../models/order");
 
 //register
 const register=async (req,res)=>{
@@ -86,7 +87,7 @@ const login=async (req,res)=>{
 }
 
 //update profile
-const update=async(req,res)=>{
+const updateProfile=async(req,res)=>{
     try{
     const {name,password,address}=req.body;
     const user=await User.findById(req.user._id);
@@ -111,5 +112,34 @@ const update=async(req,res)=>{
     }catch(error){
         console.log(error);
     }
-}
-module.exports= {register,login,update}
+};
+
+const secret = async (req, res) => {
+    res.json({ currentUser: req.user });
+  };
+
+  //get all orders
+
+const getOrders = async (req, res) => {
+    try {
+      const orders = await Order.find({ buyer: req.user._id })
+        .populate("products", "-photo")
+        .populate("buyer", "name");
+      res.json(orders);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  
+const allOrders = async (req, res) => {
+    try {
+      const orders = await Order.find({})
+        .populate("products", "-photo")
+        .populate("buyer", "name")
+        .sort({ createdAt: "-1" });
+      res.json(orders);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+module.exports= {register,login,updateProfile,getOrders,allOrders,secret}
